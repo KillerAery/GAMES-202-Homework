@@ -40,9 +40,9 @@ highp float rand_2to1(vec2 uv ) {
 	return fract(sin(sn) * c);
 }
 
-float unpack(vec4 rgbaDepth) {
-    const vec4 bitShift = vec4(1.0, 1.0/256.0, 1.0/(256.0*256.0), 1.0/(256.0*256.0*256.0));
-    return dot(rgbaDepth, bitShift);
+float unpack(vec4 rgbaDepth) {
+  const vec4 bitShift = vec4(1.0, 1/255.0, 1/65025.0, 1/16581375.0);
+  return dot(rgbaDepth, bitShift);
 }
 
 vec2 poissonDisk[NUM_SAMPLES];
