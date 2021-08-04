@@ -105,6 +105,10 @@ float PCSS(sampler2D shadowMap, vec4 coords){
 
 
 float useShadowMap(sampler2D shadowMap, vec4 shadowCoord){
+  float depthInShadowmap = unpack(texture2D(shadowMap,shadowCoord.xy).rgba);
+  float bias = 0.005;
+  if(depthInShadowmap + bias <shadowCoord.z)
+    return 0.0;
   return 1.0;
 }
 
