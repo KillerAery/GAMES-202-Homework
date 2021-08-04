@@ -40,9 +40,9 @@ highp float rand_2to1(vec2 uv ) {
 	return fract(sin(sn) * c);
 }
 
-float unpack(vec4 rgbaDepth) {
-  const vec4 bitShift = vec4(1.0, 1/255.0, 1/65025.0, 1/16581375.0);
-  return dot(rgbaDepth, bitShift);
+float unpack(vec4 rgbaDepth) {
+    const vec4 bitShift = vec4(1.0, 1.0/255.0, 1.0/(255.0*255.0), 1.0/(255.0*255.0*255.0));
+    return dot(rgbaDepth, bitShift);
 }
 
 vec2 poissonDisk[NUM_SAMPLES];
@@ -132,14 +132,14 @@ vec3 blinnPhong() {
 }
 
 void main(void) {
-
   float visibility;
-  //visibility = useShadowMap(uShadowMap, vec4(shadowCoord, 1.0));
+  vec3 projCoords = vPositionFromLight.xyz / vPositionFromLight.w;
+  vec3 shadowCoord = projCoords * 0.5 + 0.5;
+  visibility = useShadowMap(uShadowMap, vec4(shadowCoord, 1.0));
   //visibility = PCF(uShadowMap, vec4(shadowCoord, 1.0));
   //visibility = PCSS(uShadowMap, vec4(shadowCoord, 1.0));
 
   vec3 phongColor = blinnPhong();
 
-  //gl_FragColor = vec4(phongColor * visibility, 1.0);
-  gl_FragColor = vec4(phongColor, 1.0);
+  gl_FragColor = vec4(phongColor * visibility, 1.0);
 }
