@@ -15,7 +15,7 @@ varying highp vec3 vFragPos;
 varying highp vec3 vNormal;
 
 // Shadow map related variables
-#define NUM_SAMPLES 20
+#define NUM_SAMPLES 40
 #define BLOCKER_SEARCH_NUM_SAMPLES NUM_SAMPLES
 #define PCF_NUM_SAMPLES NUM_SAMPLES
 #define NUM_RINGS 10
@@ -48,8 +48,8 @@ float unpack(vec4 rgbaDepth) {
 vec2 poissonDisk[NUM_SAMPLES];
 
 void poissonDiskSamples( const in vec2 randomSeed ) {
-
-  float ANGLE_STEP = PI2 * float( NUM_RINGS ) / float( NUM_SAMPLES );
+  float ANGLE_STEP = 3.883222077450933;// (sqrt(5)-1)/2 *2PI
+  //float ANGLE_STEP = PI2 * float( NUM_RINGS ) / float( NUM_SAMPLES );
   float INV_NUM_SAMPLES = 1.0 / float( NUM_SAMPLES );
 
   float angle = rand_2to1( randomSeed ) * PI2;
@@ -83,30 +83,49 @@ void uniformDiskSamples( const in vec2 randomSeed ) {
   }
 }
 
-float findBlocker( sampler2D shadowMap,  vec2 uv, float zReceiver ) {
-	return 1.0;
+float PCF(sampler2D shadowMap, vec4 coords) {
+  poissonDiskSamples(coords.xy);
+  const float bias = 0.005;
+  float sum = 0.0;
+  for(int i = 0;i<PCF_NUM_SAMPLES;++i){
+    float depthInShadowmap = unpack(texture2D(shadowMap,coords.xy+poissonDisk[i]*0.001).rgba);
+    sum += ((depthInShadowmap + bias)< coords.z?0.0:1.0);
+  }
+  return sum/float(PCF_NUM_SAMPLES);
 }
 
-float PCF(sampler2D shadowMap, vec4 coords) {
-  return 1.0;
+
+float findBlocker( sampler2D shadowMap,  vec2 uv, float zReceiver ) {
+  float dBlocker = 0.0;
+    for(int i = 0;i<PCF_NUM_SAMPLES;++i){
+    float depthInShadowmap = unpack(texture2D(shadowMap,uv+poissonDisk[i]*0.1).rgba);
+    dBlocker += depthInShadowmap;
+  }
+  dBlocker /= float(PCF_NUM_SAMPLES);
+	return dBlocker;
 }
 
 float PCSS(sampler2D shadowMap, vec4 coords){
-
+  poissonDiskSamples(coords.xy);
   // STEP 1: avgblocker depth
-
+  float dBlocker = findBlocker(shadowMap,coords.xy,coords.z);
   // STEP 2: penumbra size
-
+  const float pscale = 0.02;
+  float penumbra = (coords.z-dBlocker)/dBlocker * pscale;
   // STEP 3: filtering
-  
-  return 1.0;
-
+  const float bias = 0.005;
+  float sum = 0.0;
+  for(int i = 0;i<PCF_NUM_SAMPLES;++i){
+    float depthInShadowmap = unpack(texture2D(shadowMap,coords.xy+poissonDisk[i]*penumbra).rgba);
+    sum += ((depthInShadowmap + bias)< coords.z?0.0:1.0);
+  }
+  return sum/float(PCF_NUM_SAMPLES);
 }
 
 
 float useShadowMap(sampler2D shadowMap, vec4 shadowCoord){
   float depthInShadowmap = unpack(texture2D(shadowMap,shadowCoord.xy).rgba);
-  float bias = 0.005;
+  const float bias = 0.005;
   if(depthInShadowmap + bias <shadowCoord.z)
     return 0.0;
   return 1.0;
@@ -139,9 +158,9 @@ void main(void) {
   float visibility;
   vec3 projCoords = vPositionFromLight.xyz / vPositionFromLight.w;
   vec3 shadowCoord = projCoords * 0.5 + 0.5;
-  visibility = useShadowMap(uShadowMap, vec4(shadowCoord, 1.0));
+  //visibility = useShadowMap(uShadowMap, vec4(shadowCoord, 1.0));
   //visibility = PCF(uShadowMap, vec4(shadowCoord, 1.0));
-  //visibility = PCSS(uShadowMap, vec4(shadowCoord, 1.0));
+  visibility = PCSS(uShadowMap, vec4(shadowCoord, 1.0));
 
   vec3 phongColor = blinnPhong();
 
