@@ -15,8 +15,8 @@ varying highp vec3 vFragPos;
 varying highp vec3 vNormal;
 
 // Shadow map related variables
-#define NUM_SAMPLES 40
-#define BLOCKER_SEARCH_NUM_SAMPLES NUM_SAMPLES
+#define NUM_SAMPLES 80
+#define BLOCKER_SEARCH_NUM_SAMPLES 80
 #define PCF_NUM_SAMPLES NUM_SAMPLES
 #define NUM_RINGS 10
 
@@ -95,14 +95,14 @@ float PCF(sampler2D shadowMap, vec4 coords) {
 }
 
 
-float findBlocker( sampler2D shadowMap,  vec2 uv, float zReceiver ) {
+float findBlocker( sampler2D shadowMap, vec2 uv, float zReceiver ) {
   float dBlocker = 0.0;
-    for(int i = 0;i<PCF_NUM_SAMPLES;++i){
+  for(int i = 0;i<BLOCKER_SEARCH_NUM_SAMPLES;++i){
     float depthInShadowmap = unpack(texture2D(shadowMap,uv+poissonDisk[i]*0.1).rgba);
     dBlocker += depthInShadowmap;
   }
-  dBlocker /= float(PCF_NUM_SAMPLES);
-	return dBlocker;
+	dBlocker /= float(BLOCKER_SEARCH_NUM_SAMPLES);
+  return dBlocker;
 }
 
 float PCSS(sampler2D shadowMap, vec4 coords){
