@@ -15,9 +15,9 @@ varying highp vec3 vFragPos;
 varying highp vec3 vNormal;
 
 // Shadow map related variables
-#define NUM_SAMPLES 80
-#define BLOCKER_SEARCH_NUM_SAMPLES 80
-#define PCF_NUM_SAMPLES NUM_SAMPLES
+#define NUM_SAMPLES 40
+#define BLOCKER_SEARCH_NUM_SAMPLES 40
+#define PCF_NUM_SAMPLES 40
 #define NUM_RINGS 10
 
 #define EPS 1e-3
@@ -96,13 +96,19 @@ float PCF(sampler2D shadowMap, vec4 coords) {
 
 
 float findBlocker( sampler2D shadowMap, vec2 uv, float zReceiver ) {
-  float dBlocker = 0.0;
+  float dBlocker = zReceiver*0.01;
+  const float wLight = 0.006;
+  const float c = 10.0;
+  float sampleSize = wLight*zReceiver*c;
+  float sum = 0.01;
   for(int i = 0;i<BLOCKER_SEARCH_NUM_SAMPLES;++i){
-    float depthInShadowmap = unpack(texture2D(shadowMap,uv+poissonDisk[i]*0.1).rgba);
-    dBlocker += depthInShadowmap;
+    float depthInShadowmap = unpack(texture2D(shadowMap,uv+poissonDisk[i]*sampleSize).rgba);
+    if(depthInShadowmap < zReceiver){
+      dBlocker += depthInShadowmap;
+      sum += 1.0;
+    }
   }
-	dBlocker /= float(BLOCKER_SEARCH_NUM_SAMPLES);
-  return dBlocker;
+  return dBlocker/float(sum);
 }
 
 float PCSS(sampler2D shadowMap, vec4 coords){
@@ -110,8 +116,8 @@ float PCSS(sampler2D shadowMap, vec4 coords){
   // STEP 1: avgblocker depth
   float dBlocker = findBlocker(shadowMap,coords.xy,coords.z);
   // STEP 2: penumbra size
-  const float pscale = 0.02;
-  float penumbra = (coords.z-dBlocker)/dBlocker * pscale;
+  const float wLight = 0.006;
+  float penumbra = (coords.z-dBlocker)/dBlocker * wLight;
   // STEP 3: filtering
   const float bias = 0.005;
   float sum = 0.0;
