@@ -5,9 +5,7 @@ class MeshRender {
 	#normalBuffer;
 	#texcoordBuffer;
 	#indicesBuffer;
-	#precomputeLTBuffer;
-	#currentEnvmap;
-
+	
 	constructor(gl, mesh, material) {
 
 		this.gl = gl;
@@ -187,7 +185,23 @@ class MeshRender {
 				gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMaps[guiParams.envmapId].texture);
 				gl.uniform1i(this.shader.program.uniforms[k], textureNum);
 				textureNum += 1;
+			} 
+			/*
+			else if(this.material.uniforms[k].type == 'SH'){
+				let precomputeL_value =null;
+				if(k=="uPrecomputeLR"){
+					precomputeL_value =aPrecomputeL_RGB[0];
+				}
+				else if(k=="uPrecomputeLG"){
+					precomputeL_value =aPrecomputeL_RGB[1];
+				}
+				else{
+					precomputeL_value =aPrecomputeL_RGB[2];
+				}
+				gl.uniformMatrix3fv(this.shader.program.uniforms[k], false,precomputeL_value);
+
 			}
+			*/
 		}
 	}
 
@@ -205,18 +219,13 @@ class MeshRender {
 		gl.useProgram(this.shader.program.glShaderProgram);
 		
 		// Bind attribute mat3 - LT
-		if(this.#precomputeLTBuffer){
-			gl.bindBuffer(gl.ARRAY_BUFFER,this.#precomputeLTBuffer);
-		
-			if(this.#currentEnvmap !== guiParams.envmapId){
-				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(precomputeLT[guiParams.envmapId]), gl.STATIC_DRAW);
-				this.#currentEnvmap = guiParams.envmapId;
-			}	
+		const buf = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(precomputeLT[guiParams.envmapId]), gl.STATIC_DRAW);
 	
-			for (var ii = 0; ii < 3; ++ii) {
-				gl.enableVertexAttribArray(this.shader.program.attribs['aPrecomputeLT'] + ii);
-				gl.vertexAttribPointer(this.shader.program.attribs['aPrecomputeLT'] + ii, 3, gl.FLOAT, false, 36, ii * 12);
-			}
+		for (var ii = 0; ii < 3; ++ii) {
+			gl.enableVertexAttribArray(this.shader.program.attribs['aPrecomputeLT'] + ii);
+			gl.vertexAttribPointer(this.shader.program.attribs['aPrecomputeLT'] + ii, 3, gl.FLOAT, false, 36, ii * 12);
 		}
 
 		// Bind geometry information
