@@ -9,9 +9,10 @@ class PRTMaterial extends Material {
             'uSampler': { type: 'texture', value: color },
             'uKs': { type: '3fv', value: specular },
             'uLightRadiance': { type: '3fv', value: lightIntensity },
-            // Shadow
-            'uShadowMap': { type: 'texture', value: light.fbo },
-            'uLightMVP': { type: 'matrix4fv', value: lightMVP },
+            // PrecomputeL
+            'uPrecomputeLR' : { type: 'SH', value: null },
+            'uPrecomputeLG' : { type: 'SH', value: null },
+            'uPrecomputeLB' : { type: 'SH', value: null },
         }, [
             'aPrecomputeLT'
         ], vertexShader, fragmentShader, null);

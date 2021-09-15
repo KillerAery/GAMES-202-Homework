@@ -186,22 +186,6 @@ class MeshRender {
 				gl.uniform1i(this.shader.program.uniforms[k], textureNum);
 				textureNum += 1;
 			} 
-			/*
-			else if(this.material.uniforms[k].type == 'SH'){
-				let precomputeL_value =null;
-				if(k=="uPrecomputeLR"){
-					precomputeL_value =aPrecomputeL_RGB[0];
-				}
-				else if(k=="uPrecomputeLG"){
-					precomputeL_value =aPrecomputeL_RGB[1];
-				}
-				else{
-					precomputeL_value =aPrecomputeL_RGB[2];
-				}
-				gl.uniformMatrix3fv(this.shader.program.uniforms[k], false,precomputeL_value);
-
-			}
-			*/
 		}
 	}
 
