@@ -34,9 +34,9 @@ function computeSquareMatrix_3by3(rotationMatrix){
 	let Pn2 = SHEval(n2[0],n2[1],n2[2],3);
 	let Pn3 = SHEval(n3[0],n3[1],n3[2],3);
 	let A = math.matrix([
-		[Pn1[0],Pn2[0],Pn3[0]],
 		[Pn1[1],Pn2[1],Pn3[1]],
-		[Pn1[2],Pn2[2],Pn3[2]]
+		[Pn1[2],Pn2[2],Pn3[2]],
+		[Pn1[3],Pn2[3],Pn3[3]]
 	]);
 	// 3、用 R 旋转 ni - {R(ni)}
 	let Rn1 = math.multiply(rotationMatrix,n1);
