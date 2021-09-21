@@ -52,7 +52,7 @@ function computeSquareMatrix_3by3(rotationMatrix){
 		[PRn1[3],PRn2[3],PRn3[3]]
 	]);
 	// 5、S*A_inverse
-	return math.multiply(S._data,math.inv(A)._data);
+	return math.transpose(math.multiply(S._data,math.inv(A)._data));
 }
 
 function computeSquareMatrix_5by5(rotationMatrix){ 
@@ -94,7 +94,7 @@ function computeSquareMatrix_5by5(rotationMatrix){
 		[PRn1[8],PRn2[8],PRn3[8],PRn4[8],PRn5[8]]
 	]);
 	// 5、S*A_inverse
-	return math.multiply(S._data,math.inv(A)._data);
+	return math.transpose(math.multiply(S._data,math.inv(A)._data));
 }
 
 function mat4Matrix2mathMatrix(rotationMatrix){
