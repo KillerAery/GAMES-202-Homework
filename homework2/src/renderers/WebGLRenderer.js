@@ -52,7 +52,7 @@ class WebGLRenderer {
                 for (let k in this.meshes[i].material.uniforms) {
 
                     let cameraModelMatrix = mat4.create();
-                    cameraModelMatrix = mat4.fromRotation(cameraModelMatrix, timer, [0, 1, 0]);
+                    cameraModelMatrix = mat4.fromRotation(cameraModelMatrix, timer*5.0, [0, 1, 0]);
 
                     if (k == 'uMoveWithCamera') { // The rotation of the skybox
                         gl.uniformMatrix4fv(

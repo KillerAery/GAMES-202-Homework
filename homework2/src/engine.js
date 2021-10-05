@@ -1,6 +1,6 @@
 let precomputeLT = [];
 let precomputeL = [];
-var cameraPosition = [50, 0, 100];
+var cameraPosition = [0, 0, 50];
 
 var envmap = [
 	'assets/cubemap/CornellBox',
