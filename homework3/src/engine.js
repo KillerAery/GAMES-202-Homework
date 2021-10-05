@@ -72,7 +72,7 @@ function GAMES202Main() {
 	*/
 	// /*
 	// Cube
-	lightRadiance = [1, 1, 1];
+	lightRadiance = [1, 0.6, 0.5];
 	lightPos = [-2, 4, 1];
 	lightDir = {
 		'x': 0.4,
