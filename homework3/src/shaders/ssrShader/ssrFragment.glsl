@@ -122,10 +122,10 @@ vec3 GetGBufferDiffuse(vec2 uv) {
  *
  */
 vec3 EvalDiffuse(vec3 wi, vec3 wo, vec2 uv) {
-  vec3 L = vec3(0.0);
-  vec3 diffuse = GetGBufferDiffuse(uv);
-  vec3 n = GetGBufferNormalWorld(uv);
-  return L;
+  vec3 albedo = GetGBufferDiffuse(GetScreenCoordinate(vPosWorld.xyz));
+  vec3 normal = normalize(GetGBufferNormalWorld(uv));
+  vec3 bsdf = albedo * (max(dot(wi,normal),0.0)) * INV_PI;
+  return bsdf;
 }
 
 /*
@@ -135,27 +135,63 @@ vec3 EvalDiffuse(vec3 wi, vec3 wo, vec2 uv) {
  */
 vec3 EvalDirectionalLight(vec2 uv) {
   float visibility = GetGBufferuShadow(uv);
-  vec3 n = GetGBufferNormalWorld(uv);
-  vec3 diffuse = GetGBufferDiffuse(uv);
-  vec3 Le = visibility*uLightRadiance*(dot(n,uLightDir))*diffuse;
+  vec3 Le = uLightRadiance * visibility;
   return Le;
 }
 
 bool RayMarch(vec3 ori, vec3 dir, out vec3 hitPos) {
+  float step = 0.2;
+  vec3 endPoint = ori;
+  for(int i=0;i<40;i++){
+    vec3 testPoint = endPoint + step * dir;
+    float testDepth = GetDepth(testPoint);
+    float bufferDepth = GetGBufferDepth(GetScreenCoordinate(testPoint));
+    // 如果测试点到达几何表面深度或者更深的地方，则视为相交
+    if(testDepth-bufferDepth > -1e-6){
+      hitPos = testPoint;
+      return true;
+    }
+    else if( testDepth < bufferDepth ){
+      endPoint = testPoint;
+    }
+  }
   return false;
 }
 
-#define SAMPLE_NUM 1
+#define SAMPLE_NUM 15
+
+vec3 EvalIndirectLight(vec2 uv,out float seed){
+  vec3 Lindirect = vec3(0.0);
+  vec3 wi = uLightDir;
+  vec3 wo = uCameraPos-vPosWorld.xyz;
+  vec3 normal = normalize(GetGBufferNormalWorld(uv));
+  for(int i = 0;i<SAMPLE_NUM;++i){
+    float pdf;
+    vec3 sampleDir = SampleHemisphereCos(seed,pdf);
+    vec3 b1,b2; 
+    LocalBasis(normal,b1,b2);
+    sampleDir = normalize(mat3(b1,b2,normal)*sampleDir);
+    vec3 hitPos;
+    if(RayMarch(vPosWorld.xyz,sampleDir,hitPos)){
+      vec2 uvHitPos = GetScreenCoordinate(hitPos);
+      Lindirect += EvalDiffuse(sampleDir,wo,uv)/pdf*EvalDiffuse(wi,sampleDir,uvHitPos)*EvalDirectionalLight(uvHitPos);
+    };
+  }
+  return Lindirect/float(SAMPLE_NUM);
+}
 
 void main() {
   float s = InitRand(gl_FragCoord.xy);
   // vec3 L = vec3(0.0);
   // L = GetGBufferDiffuse(GetScreenCoordinate(vPosWorld.xyz));
   // vec3 color = pow(clamp(L, vec3(0.0), vec3(1.0)), vec3(1.0 / 2.2));
+  vec3 wi = uLightDir;
   vec3 wo = uCameraPos-vPosWorld.xyz;
-
   vec2 uv = GetScreenCoordinate(vPosWorld.xyz);
+  vec3 Ldirect = EvalDiffuse(wi,wo,uv)*EvalDirectionalLight(uv);
+  vec3 Lindirect = EvalIndirectLight(uv,s);
 
-  vec3 color = EvalDirectionalLight(uv);
+  vec3 L = Ldirect + Lindirect;
+  vec3 color = pow(clamp(L, vec3(0.0), vec3(1.0)), vec3(1.0 / 2.2));
   gl_FragColor = vec4(vec3(color.rgb), 1.0);
 }
