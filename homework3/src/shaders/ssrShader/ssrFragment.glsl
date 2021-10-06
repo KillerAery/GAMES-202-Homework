@@ -12,6 +12,7 @@ uniform sampler2D uGShadow;
 uniform sampler2D uGPosWorld;
 
 varying mat4 vWorldToScreen;
+varying mat4 vScreenToWorld;
 varying highp vec4 vPosWorld;
 
 #define M_PI 3.1415926535897932384626433832795
@@ -124,8 +125,8 @@ vec3 GetGBufferDiffuse(vec2 uv) {
 vec3 EvalDiffuse(vec3 wi, vec3 wo, vec2 uv) {
   vec3 albedo = GetGBufferDiffuse(GetScreenCoordinate(vPosWorld.xyz));
   vec3 normal = normalize(GetGBufferNormalWorld(uv));
-  vec3 bsdf = albedo * (max(dot(wi,normal),0.0)) * INV_PI;
-  return bsdf;
+  vec3 bsdfWithCosine = albedo * INV_PI * (max(dot(wi,normal),0.0));
+  return bsdfWithCosine;
 }
 
 /*
@@ -140,25 +141,25 @@ vec3 EvalDirectionalLight(vec2 uv) {
 }
 
 bool RayMarch(vec3 ori, vec3 dir, out vec3 hitPos) {
-  float step = 0.2;
+  float step = 1.0;
   vec3 endPoint = ori;
-  for(int i=0;i<40;i++){
+  for(int i=0;i<10;++i){
     vec3 testPoint = endPoint + step * dir;
     float testDepth = GetDepth(testPoint);
-    float bufferDepth = GetGBufferDepth(GetScreenCoordinate(testPoint));
-    // 如果测试点到达几何表面深度或者更深的地方，则视为相交
-    if(testDepth-bufferDepth > -1e-6){
+    vec2 testScreenPos = GetScreenCoordinate(testPoint);
+    float bufferDepth = GetGBufferDepth(testScreenPos);
+    float depthDT = testDepth-bufferDepth;
+    if(depthDT > -1e-6){
+      //hitPos = testPoint-depthDT*0.1*dir;
       hitPos = testPoint;
       return true;
     }
-    else if( testDepth < bufferDepth ){
-      endPoint = testPoint;
-    }
+    endPoint = testPoint;
   }
   return false;
 }
 
-#define SAMPLE_NUM 15
+#define SAMPLE_NUM 100
 
 vec3 EvalIndirectLight(vec2 uv,out float seed){
   vec3 Lindirect = vec3(0.0);
