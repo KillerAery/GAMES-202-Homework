@@ -31,7 +31,7 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
 	float denom = (NdotH2 * (a2 - 1.0) + 1.0);
 	denom = PI * denom * denom;
 
-	return nom / max(denom, 0.0001);
+	return nom / denom;
 }
 
 float GeometrySchlickGGX(float NdotV, float roughness)
@@ -49,8 +49,8 @@ float GeometrySchlickGGX(float NdotV, float roughness)
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 {
     // TODO: To calculate Smith G here
-    float NoV = dot(N,V);
-    float NoL = dot(N,L);
+    float NoV = max(dot(N,V),0.0);
+    float NoL = max(dot(N,L),0.0);
     float ggx2 = GeometrySchlickGGX(NoV, roughness);
     float ggx1 = GeometrySchlickGGX(NoL, roughness);
 
@@ -59,11 +59,9 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 
 vec3 fresnelSchlick(vec3 F0, vec3 V, vec3 N)
 {
-    // TODO: To calculate Schlick F here
-	// t=(1-NdotV)^5
+    // TODO: To calculate Schlick F here    
     float t = 1.0-dot(V,N);
-    t = t*t*t*t*t;
-	return F0 + (1.0 - F0) * t;
+	return F0 + (1.0 - F0) * pow(t,5.0);
 }
 
 void main(void) {
