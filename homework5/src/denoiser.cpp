@@ -46,7 +46,43 @@ Buffer2D<Float3> Denoiser::Filter(const FrameInfo &frameInfo) {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             // TODO: Joint bilateral filter
-            filteredImage(x, y) = frameInfo.m_beauty(x, y);
+            Float3 color = Float3(0.0f,0.0f,0.0f);
+            float cumulate = 0.0f;
+
+            for (int dy = -kernelRadius; dy <= kernelRadius; ++dy) {
+                int j = y + dy;
+                if (j < 0 || j >= height) continue;
+                for (int dx = -kernelRadius; dx <= kernelRadius; ++dx) {
+                    int i = x + dx;
+                    if (i < 0 || i >= width) continue;
+
+                    float Dij2 = dx * dx + dy * dy;
+
+                    Float3 deltaColor = frameInfo.m_beauty(x, y) - frameInfo.m_beauty(i, j);
+                    float DCiCj2 = Dot(deltaColor, deltaColor);
+
+                    float Dnormal2 = 0.0f;
+                    Dnormal2 = SafeAcos(Dot(frameInfo.m_normal(x, y), frameInfo.m_normal(i,j)));
+                    Dnormal2 = std::min(1.0f,std::max(0.0f, Dnormal2));
+                    Dnormal2 *= Dnormal2;
+
+                    float Dplane2 = 0.0f;
+                    Float3 deltaPosition = frameInfo.m_position(i, j) - frameInfo.m_position(x, y);
+                    if (Dot(deltaPosition, deltaPosition) > 0.0001f) {
+                        Dplane2 = Dot(frameInfo.m_normal(x, y), Normalize(deltaPosition));
+                        Dplane2 *= Dplane2;
+                    }
+
+                    float J = exp(-Dij2 / (2.0f * m_sigmaCoord * m_sigmaCoord) -
+                                  DCiCj2 / (2.0f * m_sigmaColor * m_sigmaColor) -
+                                  Dnormal2 / (2.0f * m_sigmaNormal * m_sigmaNormal) -
+                                  Dplane2 / (2.0f * m_sigmaPlane * m_sigmaPlane));
+                    cumulate += J;
+                    color += frameInfo.m_beauty(i, j) * J;
+                }
+            }
+
+            filteredImage(x, y) = color / cumulate;
         }
     }
     return filteredImage;
