@@ -26,15 +26,15 @@
 
 ## SH Lighting Unshadowed 效果
 
-
+<img src="Markdown_Image\sh-unshadowed.png" alt="sh-unshadowed" style="zoom:67%;" />
 
 ## SH Lighting Shadowed 效果
 
-
+<img src="Markdown_Image\sh-shadowed.png" alt="sh-shadowed" style="zoom:67%;" />
 
 ## SH Lighting Shadowed & Interreflection 效果
 
-
+![sh-shadowed&interreflection](Markdown_Image\sh-shadowed&interreflection.png)
 
 ## SH Rotation 效果
 
