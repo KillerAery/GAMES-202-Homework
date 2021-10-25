@@ -175,7 +175,7 @@ Buffer2D<Float3> Denoiser::ProcessFrame(const FrameInfo &frameInfo) {
     // Maintain
     Maintain(frameInfo);
     if (!m_useTemportal) {
-        //m_useTemportal = true;
+        m_useTemportal = true;
     }
     return m_accColor;
 }
