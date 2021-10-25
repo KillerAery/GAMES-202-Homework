@@ -8,15 +8,15 @@
 
 ## 基础 Shadow Mapping 效果
 
-<img src="Markdown_Image\Shadow.png" alt="Shadow" style="zoom:67%;" />
+<img src="Markdown_Image/Shadow.png" alt="Shadow" style="zoom:67%;" />
 
 ## PCF 效果
 
-<img src="Markdown_Image\PCF.png" alt="PCF" style="zoom:67%;" />
+<img src="Markdown_Image/PCF.png" alt="PCF" style="zoom:67%;" />
 
 ## PCSS 效果
 
-<img src="Markdown_Image\PCSS.png" alt="PCSS" style="zoom:67%;" />
+<img src="Markdown_Image/PCSS.png" alt="PCSS" style="zoom:67%;" />
 
 
 
@@ -26,15 +26,15 @@
 
 ## SH Lighting Unshadowed 效果
 
-<img src="Markdown_Image\sh-unshadowed.png" alt="sh-unshadowed" style="zoom:67%;" />
+<img src="Markdown_Image/sh-unshadowed.png" alt="sh-unshadowed" style="zoom:67%;" />
 
 ## SH Lighting Shadowed 效果
 
-<img src="Markdown_Image\sh-shadowed.png" alt="sh-shadowed" style="zoom:67%;" />
+<img src="Markdown_Image/sh-shadowed.png" alt="sh-shadowed" style="zoom:67%;" />
 
 ## SH Lighting Shadowed & Interreflection 效果
 
-![sh-shadowed&interreflection](Markdown_Image\sh-shadowed&interreflection.png)
+![sh-shadowed&interreflection](Markdown_Image/sh-shadowed&interreflection.png)
 
 ## SH Rotation 效果
 
@@ -48,17 +48,17 @@
 
 ## Screen Space Ray Tracing 效果
 
-<img src="Markdown_Image\ScreenSpaceRayTracing.jpg" alt="ScreenSpaceRayTracing" style="zoom: 50%;" />
+<img src="Markdown_Image/ScreenSpaceRayTracing.jpg" alt="ScreenSpaceRayTracing" style="zoom: 50%;" />
 
 # Homework4（PBR）
 
 ## Microfacet BRDF 效果
 
-<img src="Markdown_Image\PBR(MicrofacetBRDF).png" alt="PBR(MicrofacetBRDF)" style="zoom:73%;" />
+<img src="Markdown_Image/PBR(MicrofacetBRDF).png" alt="PBR(MicrofacetBRDF)" style="zoom:73%;" />
 
 ## Microfacet BRDF & Kulla-Conty 效果
 
-<img src="Markdown_Image\PBR(Microfacet BRDF&Kulla-Conty).png" alt="PBR(Microfacet BRDF&Kulla-Conty)" style="zoom:67%;" />
+<img src="Markdown_Image/PBR(Microfacet BRDF&Kulla-Conty).png" alt="PBR(Microfacet BRDF&Kulla-Conty)" style="zoom:67%;" />
 
 # Homework5（Denoise）
 
