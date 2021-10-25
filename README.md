@@ -74,7 +74,7 @@
 
 ![box-filter](Markdown_Image/box-filter.gif)
 
-## 联合双边滤波 & TAA 终效果
+## 联合双边滤波 & TAA 最终效果
 
 ![box-final](Markdown_Image/box-final.gif)
 
