@@ -38,7 +38,7 @@
 
 ## SH Rotation 效果
 
-![SHRotation](Markdown_Image\SHRotation.gif)
+![SHRotation](Markdown_Image/SHRotation.gif)
 
 
 
@@ -64,20 +64,20 @@
 
 ---
 
-![box-input](Markdown_Image\box-input.gif)
+![box-input](Markdown_Image/box-input.gif)
 
 ## TAA 效果
 
-![box-taa](Markdown_Image\box-taa.gif)
+![box-taa](Markdown_Image/box-taa.gif)
 
 ## 联合双边滤波效果
 
-![box-filter](Markdown_Image\box-filter.gif)
+![box-filter](Markdown_Image/box-filter.gif)
 
 ## 联合双边滤波 & TAA 终效果
 
-![box-final](Markdown_Image\box-final.gif)
+![box-final](Markdown_Image/box-final.gif)
 
 
 
-![pinkroom-final](Markdown_Image\pinkroom-final.gif)
+![pinkroom-final](Markdown_Image/pinkroom-final.gif)
