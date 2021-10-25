@@ -244,19 +244,21 @@ public:
             }
         }
         if (m_Type == Type::Interreflection)
-        {
-            // TODO: leave for bonus
-            auto interreflectedTransport = m_TransportSHCoeffs;
-			for (int i = 0; i < mesh->getVertexCount(); ++i) {
-				const Point3f& v = mesh->getVertexPositions().col(i);
-				const Normal3f& n = mesh->getVertexNormals().col(i);
-                std::vector<double> coffs = IndirectCoeffs(v,n,0,scene);
-				for (int j = 0; j < SHCoeffLength; j++)
-				{
-                    interreflectedTransport.col(i).coeffRef(j) += coffs[j];
+		{
+			// TODO: leave for bonus
+            for (int c = 0; c < m_Bounce; ++c) {
+				auto interreflectedTransport = m_TransportSHCoeffs;
+				for (int i = 0; i < mesh->getVertexCount(); ++i) {
+					const Point3f& v = mesh->getVertexPositions().col(i);
+					const Normal3f& n = mesh->getVertexNormals().col(i);
+					std::vector<double> coffs = IndirectCoeffs(v, n, 0, scene);
+					for (int j = 0; j < SHCoeffLength; j++)
+					{
+						interreflectedTransport.col(i).coeffRef(j) += coffs[j];
+					}
 				}
-			}
-            m_TransportSHCoeffs = interreflectedTransport;
+				m_TransportSHCoeffs = interreflectedTransport;
+            }
         }
 
         // Save in face format
@@ -306,12 +308,12 @@ public:
             // 半球以外，不必计算
 			double H = n.dot(wi);
             if (H <= 0) { 
-                return indirectCoeffs; 
+                continue;
             }
             // 没有相交，不必计算
             Intersection intersection;
             if (!scene->rayIntersect(Ray3f(v, wi), intersection)) { 
-                return indirectCoeffs; 
+				continue;
             }
             // 当前交点
 			Point3f hitPoint = intersection.p;
@@ -333,16 +335,19 @@ public:
 				.normalized();
             
             // 获得下一次 bounce 的SH系数
-			auto nextBounce = IndirectCoeffs(hitPoint, hitNormal, bounce + 1, scene);
             for (int j = 0; j < SHCoeffLength; j++)
 			{
                 indirectCoeffs[j]
                        += (m_TransportSHCoeffs.col(triangleIndexs.x()).coeff(j) * bary.x()
                         + m_TransportSHCoeffs.col(triangleIndexs.y()).coeff(j) * bary.y()
                         + m_TransportSHCoeffs.col(triangleIndexs.z()).coeff(j) * bary.z()
-                        + nextBounce[j]) * H / static_cast<float>(sample_side*sample_side);
+                           ) * H;
 			}
 		}
+		}
+		for (int j = 0; j < SHCoeffLength; j++)
+		{
+			indirectCoeffs[j] /= (sample_side* sample_side);
 		}
 		return indirectCoeffs;
 	}
