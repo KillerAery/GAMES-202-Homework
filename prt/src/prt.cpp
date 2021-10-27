@@ -11,6 +11,8 @@
 
 NORI_NAMESPACE_BEGIN
 
+const float PI = 3.1415926535898f;
+
 namespace ProjEnv
 {
     std::vector<std::unique_ptr<float[]>>
@@ -309,7 +311,7 @@ public:
 			double H = n.dot(wi);
             if (H <= 0) { 
                 continue;
-            }
+			}
             // 没有相交，不必计算
             Intersection intersection;
             if (!scene->rayIntersect(Ray3f(v, wi), intersection)) { 
@@ -338,16 +340,16 @@ public:
             for (int j = 0; j < SHCoeffLength; j++)
 			{
                 indirectCoeffs[j]
-                       += (m_TransportSHCoeffs.col(triangleIndexs.x()).coeff(j) * bary.x()
+                       += ((m_TransportSHCoeffs.col(triangleIndexs.x()).coeff(j) * bary.x()
                         + m_TransportSHCoeffs.col(triangleIndexs.y()).coeff(j) * bary.y()
                         + m_TransportSHCoeffs.col(triangleIndexs.z()).coeff(j) * bary.z()
-                           ) * H;
+                           ) * H / PI);
 			}
 		}
 		}
 		for (int j = 0; j < SHCoeffLength; j++)
 		{
-			indirectCoeffs[j] /= (sample_side* sample_side);
+			indirectCoeffs[j] /= (sample_side*sample_side);
 		}
 		return indirectCoeffs;
 	}
